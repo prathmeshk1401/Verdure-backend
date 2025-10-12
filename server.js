@@ -1,11 +1,23 @@
-const express = require("express");
-const Parser = require("rss-parser");
-const cors = require("cors");
-const dotenv = require("dotenv");
-dotenv.config();
+// index.js
 
-const connectDB = require("./config/db");
-const authRoutes = require("./routes/authRoutes");
+import express, { json, urlencoded } from "express";
+import Parser from "rss-parser";
+import cors from "cors";
+import { config } from "dotenv";
+config();
+
+import connectDB from "./config/db.js"; // note: .js extension
+import authRoutes from "./routes/authRoutes.js";
+import newsRoute from "./routes/news.js";
+import cropRoute from "./routes/crop.js";
+import storyRoute from "./routes/story.js";
+import dashboardRoute from "./routes/dashboard.js";
+import adminRoute from "./routes/admin.js";
+import forumRoute from "./routes/forum.js";
+import scheduleRoute from "./routes/schedule.js";
+import notificationRoute from "./routes/notification.js";
+import analyticsRoute from "./routes/analytics.js";
+
 const parser = new Parser();
 
 // Connect to MongoDB with error handling
@@ -14,35 +26,36 @@ connectDB().catch((err) => {
     process.exit(1);
 });
 
-
 const app = express();
 
 // Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+    origin: [
+        "https://verdure-frontend.vercel.app",
+        "https://verdure-admin.vercel.app"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
+}));
+app.use(json());
+app.use(urlencoded({ extended: true }));
 
 // Routes
 app.use("/api/auth", authRoutes);
-
-// Basic test route
-app.get("/", (req, res) => res.send("Backend is running"));
-
-const newsRoute = require("./routes/news");
 app.use("/api/news", newsRoute);
+app.use("/api/crop", cropRoute);
+app.use("/api/success-stories", storyRoute);
+app.use("/api/dashboard", dashboardRoute);
+app.use("/api", adminRoute);
+app.use("/api/forum", forumRoute);
+app.use("/api/schedule", scheduleRoute);
+app.use("/api/notifications", notificationRoute);
+app.use("/api/analytics", analyticsRoute);
 
-app.use("/api/crop", require("./routes/crop"));
-app.use("/api/success-stories", require("./routes/story"));
-// Mount dashboard routes for user and admin dashboards
-app.use("/api/dashboard", require("./routes/dashboard"));
-app.use("/api", require("./routes/admin"));
+// Base test route
+app.get("/", (req, res) => {
+    res.json({ message: "Verdure backend is running ✅" });
+});
 
-// Mount new API routes
-app.use("/api/forum", require("./routes/forum"));
-app.use("/api/schedule", require("./routes/schedule"));
-app.use("/api/notifications", require("./routes/notification"));
-app.use("/api/analytics", require("./routes/analytics"));
-
-// Start server safely
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Export app for Vercel serverless
+export default app;
