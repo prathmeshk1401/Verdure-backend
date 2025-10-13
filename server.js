@@ -4,6 +4,9 @@ const Parser = require("rss-parser");
 const cors = require("cors");
 require("dotenv").config();
 
+const host = '0.0.0.0';
+const port = process.env.PORT || 5000;
+
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const newsRoute = require("./routes/news");
@@ -57,6 +60,10 @@ app.use("/api/analytics", analyticsRoute);
 // Base test route
 app.get("/", (req, res) => {
     res.json({ message: "Verdure backend is running ✅" });
+});
+
+app.listen(port, host, () => {
+    console.log(`Server listening on http://${host}:${port}`);
 });
 
 module.exports = app;
