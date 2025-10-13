@@ -16,15 +16,25 @@ const connectDB = async () => {
     }
 
     if (!cached.promise) {
-        const opts = {
-            // mongoose v6+ no longer needs useNewUrlParser/useUnifiedTopology, but keep safe
-            // useUnifiedTopology: true,
-            // useNewUrlParser: true,
-        };
+        const opts = {};
 
-        cached.promise = mongoose.connect(process.env.MONGO_URI, opts).then((mongooseInstance) => {
-            return mongooseInstance;
-        });
+        // Attempt to connect, but capture errors to give clearer guidance
+        cached.promise = mongoose
+            .connect(process.env.MONGO_URI, opts)
+            .then((mongooseInstance) => mongooseInstance)
+            .catch((err) => {
+                // redact credentials when logging
+                let redacted = process.env.MONGO_URI;
+                try {
+                    // remove credentials between '//' and '@'
+                    redacted = redacted.replace(/:(?:[^@]+)@/, ':*****@');
+                } catch (e) {
+                    /* ignore */
+                }
+                console.error('Failed to connect to MongoDB with URI:', redacted);
+                // rethrow to be handled by caller
+                throw err;
+            });
     }
 
     cached.conn = await cached.promise;
