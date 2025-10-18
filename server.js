@@ -32,7 +32,7 @@ const app = express();
 // Middleware
 // Allow configuring allowed CORS origins via environment variable ALLOWED_ORIGINS (comma-separated).
 const defaultAllowed = [
-    "https://verdure-frontend.vercel.app",
+    "https://verdure-innovating-agriculture.vercel.app",
     "https://admin-panel-tau-lac.vercel.app/",
     // allow localhost during previews/dev — remove in production if you prefer
     "http://localhost:3000",
@@ -43,11 +43,21 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 
 app.use(
     cors({
-        origin: allowedOrigins,
-        methods: ["GET", "POST", "PUT", "DELETE"],
+        origin: function (origin, callback) {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                console.log("Blocked by CORS:", origin);
+                callback(new Error("Not allowed by CORS"));
+            }
+        },
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         credentials: true,
     })
 );
+
+app.options("*", cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -71,5 +81,7 @@ app.get("/", (req, res) => {
 app.listen(port, host, () => {
     console.log(`Server listening on http://${host}:${port}`);
 });
+
+
 
 module.exports = app;
