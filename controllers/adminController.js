@@ -80,3 +80,25 @@ exports.getUserDashboardSummary = async (req, res) => {
     }
 };
 
+// PATCH /api/users/:id/password - admin resets a user's password
+exports.resetUserPassword = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { password } = req.body;
+        if (!password || password.length < 6) {
+            return res.status(400).json({ message: "Password must be at least 6 characters" });
+        }
+
+        const bcrypt = require("bcryptjs");
+        const hashed = await bcrypt.hash(password, 10);
+
+        const updated = await User.findByIdAndUpdate(id, { password: hashed }, { new: true }).select("username email role");
+        if (!updated) return res.status(404).json({ message: "User not found" });
+
+        res.json({ message: "Password updated", user: updated });
+    } catch (err) {
+        console.error("Reset password error:", err);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+

@@ -30,14 +30,20 @@ connectDB().catch((err) => {
 const app = express();
 
 // Middleware
+// Allow configuring allowed CORS origins via environment variable ALLOWED_ORIGINS (comma-separated).
+const defaultAllowed = [
+    "https://verdure-frontend.vercel.app",
+    "https://admin-panel-tau-lac.vercel.app/",
+    // allow localhost during previews/dev — remove in production if you prefer
+    "http://localhost:3000",
+];
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(",").map((s) => s.trim())
+    : defaultAllowed;
+
 app.use(
     cors({
-        origin: [
-            "https://verdure-frontend.vercel.app",
-            "https://verdure-admin.vercel.app",
-            // allow localhost during previews/dev — remove in production if you prefer
-            "http://localhost:3000",
-        ],
+        origin: allowedOrigins,
         methods: ["GET", "POST", "PUT", "DELETE"],
         credentials: true,
     })
