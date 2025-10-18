@@ -59,7 +59,10 @@ app.use(
 );
 
 // Handle preflight requests
-app.options("*", cors());
+app.use('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 
 // -------------------------
 // Middleware
