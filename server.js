@@ -1,13 +1,11 @@
-// server.js (CommonJS)
+// server.js
 const express = require("express");
 const Parser = require("rss-parser");
 const cors = require("cors");
 require("dotenv").config();
 
-const host = '0.0.0.0';
-const port = process.env.PORT || 5000;
-
 const connectDB = require("./config/db");
+
 const authRoutes = require("./routes/authRoutes");
 const newsRoute = require("./routes/news");
 const cropRoute = require("./routes/crop");
@@ -20,26 +18,30 @@ const notificationRoute = require("./routes/notification");
 const analyticsRoute = require("./routes/analytics");
 
 const parser = new Parser();
-
-// In serverless environments, avoid exiting the process on DB errors.
-// Instead attempt to connect and let the function handler return errors.
-connectDB().catch((err) => {
-    console.error("Failed to connect to DB:", err && err.message ? err.message : err);
-});
-
 const app = express();
 
-// Middleware
-// Allow configuring allowed CORS origins via environment variable ALLOWED_ORIGINS (comma-separated).
-const defaultAllowed = [
+// -------------------------
+// Server Config
+// -------------------------
+const host = "0.0.0.0";
+const port = process.env.PORT || 5000;
+
+// -------------------------
+// Database Connection
+// -------------------------
+connectDB().catch((err) => {
+    console.error("Failed to connect to DB:", err?.message || err);
+});
+
+// -------------------------
+// CORS Configuration
+// -------------------------
+const allowedOrigins = [
     "https://verdure-innovating-agriculture.vercel.app",
-    "https://admin-panel-tau-lac.vercel.app/",
-    // allow localhost during previews/dev — remove in production if you prefer
+    "https://verdure-admin.vercel.app",
+    "https://verdure-frontend.vercel.app",
     "http://localhost:3000",
 ];
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-    ? process.env.ALLOWED_ORIGINS.split(",").map((s) => s.trim())
-    : defaultAllowed;
 
 app.use(
     cors({
@@ -56,12 +58,18 @@ app.use(
     })
 );
 
+// Handle preflight requests
 app.options("*", cors());
 
+// -------------------------
+// Middleware
+// -------------------------
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// -------------------------
 // Routes
+// -------------------------
 app.use("/api/auth", authRoutes);
 app.use("/api/news", newsRoute);
 app.use("/api/crop", cropRoute);
@@ -73,15 +81,18 @@ app.use("/api/schedule", scheduleRoute);
 app.use("/api/notifications", notificationRoute);
 app.use("/api/analytics", analyticsRoute);
 
-// Base test route
+// -------------------------
+// Base Route
+// -------------------------
 app.get("/", (req, res) => {
     res.json({ message: "Verdure backend is running ✅" });
 });
 
+// -------------------------
+// Start Server
+// -------------------------
 app.listen(port, host, () => {
-    console.log(`Server listening on http://${host}:${port}`);
+    console.log(`✅ Server listening on http://${host}:${port}`);
 });
-
-
 
 module.exports = app;
