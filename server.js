@@ -1,8 +1,6 @@
-// server.js
 const express = require("express");
 const Parser = require("rss-parser");
 const cors = require("cors");
-const path = require("path");
 require("dotenv").config();
 
 const connectDB = require("./config/db");
@@ -58,12 +56,6 @@ app.use(
         credentials: true,
     })
 );
-
-// Handle preflight requests
-app.use('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
 
 // -------------------------
 // Middleware
