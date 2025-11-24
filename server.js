@@ -5,6 +5,7 @@ require("dotenv").config();
 
 const connectDB = require("./config/db");
 
+// Routes
 const authRoutes = require("./routes/authRoutes");
 const newsRoute = require("./routes/news");
 const cropRoute = require("./routes/crop");
@@ -20,48 +21,50 @@ const parser = new Parser();
 const app = express();
 
 // -------------------------
-// Server Config
+// Allowed CORS Origins
 // -------------------------
-const host = "0.0.0.0";
-const port = process.env.PORT || 5000;
-
-// -------------------------
-// Database Connection
-// -------------------------
-connectDB().catch((err) => {
-    console.error("Failed to connect to DB:", err?.message || err);
-});
+const allowedOrigins = [
+    "http://localhost:3000",
+    "https://verdure-innovating-agriculture.vercel.app",
+    "https://verdure-admin.vercel.app",
+    "https://verdure-frontend.vercel.app",
+    "https://verdure-innovating-agriculture-hwmi.vercel.app"
+];
 
 // -------------------------
 // CORS Configuration
 // -------------------------
-const allowedOrigins = [
-    "https://verdure-innovating-agriculture.vercel.app",
-    "https://verdure-admin.vercel.app",
-    "https://verdure-frontend.vercel.app",
-    "http://localhost:3000",
-];
-
 app.use(
     cors({
         origin: function (origin, callback) {
             if (!origin || allowedOrigins.includes(origin)) {
                 callback(null, true);
             } else {
-                console.log("Blocked by CORS:", origin);
+                console.log("❌ Blocked by CORS:", origin);
                 callback(new Error("Not allowed by CORS"));
             }
         },
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        credentials: true,
+        allowedHeaders: ["Content-Type", "Authorization"],
+        credentials: true
     })
 );
+
+// For preflight
+app.options("*", cors());
 
 // -------------------------
 // Middleware
 // -------------------------
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// -------------------------
+// Database Connection
+// -------------------------
+connectDB().catch(err => {
+    console.error("Failed to connect to DB:", err);
+});
 
 // -------------------------
 // Routes
@@ -87,8 +90,11 @@ app.get("/", (req, res) => {
 // -------------------------
 // Start Server
 // -------------------------
+const host = "0.0.0.0";
+const port = process.env.PORT || 5000;
+
 app.listen(port, host, () => {
-    console.log(`✅ Server listening on http://${host}:${port}`);
+    console.log(`🚀 Server running at http://${host}:${port}`);
 });
 
 module.exports = app;
