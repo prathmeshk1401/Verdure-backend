@@ -28,7 +28,8 @@ const allowedOrigins = [
     "https://verdure-innovating-agriculture.vercel.app",
     "https://verdure-admin.vercel.app",
     "https://verdure-frontend.vercel.app",
-    "https://verdure-innovating-agriculture-hwmi.vercel.app"
+    "https://verdure-innovating-agriculture-hwmi.vercel.app",
+    "https://verdure-innovating-agriculture-hwmi-a15uvagtd.vercel.app"
 ];
 
 // -------------------------
