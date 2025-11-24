@@ -30,7 +30,8 @@ const allowedOrigins = [
     "https://verdure-frontend.vercel.app",
     "https://verdure-innovating-agriculture-hwmi-a15uvagtd.vercel.app",
     "https://verdure-innovating-agri-git-19e502-prathmeshs-projects-97d276a8.vercel.app",
-    "https://verdure-innovating-agriculture-hwmi-a9anwe8uv.vercel.app"
+    "https://verdure-innovating-agriculture-hwmi-a9anwe8uv.vercel.app",
+    "https://verdure-innovating-agriculture-hwmi-9seiuem6m.vercel.app"
 ];
 
 // -------------------------
